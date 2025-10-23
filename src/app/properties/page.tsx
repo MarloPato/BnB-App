@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { propertiesApi } from "@/lib/api";
-import { Property } from "@/types";
+import { Property } from "../../types";
 import {
   Home,
   Plus,
@@ -19,7 +19,7 @@ export default function PropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,8 +32,9 @@ export default function PropertiesPage() {
       setLoading(true);
       const data = await propertiesApi.getMyProperties();
       setProperties(data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to fetch properties");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || "Failed to fetch properties");
     } finally {
       setLoading(false);
     }
@@ -47,8 +48,9 @@ export default function PropertiesPage() {
     try {
       await propertiesApi.delete(id);
       setProperties(properties.filter((p) => p.id !== id));
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to delete property");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || "Failed to delete property");
     }
   };
 

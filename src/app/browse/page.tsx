@@ -4,15 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { propertiesApi } from "@/lib/api";
-import { Property } from "@/types";
-import {
-  Home,
-  MapPin,
-  DollarSign,
-  Calendar,
-  Search,
-  Filter,
-} from "lucide-react";
+import { Property } from "../../types";
+import { Home, MapPin, DollarSign, Calendar, Search } from "lucide-react";
 
 export default function BrowsePage() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -31,8 +24,9 @@ export default function BrowsePage() {
       setLoading(true);
       const data = await propertiesApi.getAll();
       setProperties(data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to fetch properties");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || "Failed to fetch properties");
     } finally {
       setLoading(false);
     }

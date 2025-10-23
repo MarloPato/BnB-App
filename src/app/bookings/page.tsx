@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { bookingsApi } from "@/lib/api";
-import { Booking } from "@/types";
-import { Calendar, Home, MapPin, DollarSign, Trash2, Edit } from "lucide-react";
+import { Booking } from "../../types";
+import { Calendar, MapPin, DollarSign, Trash2, Edit } from "lucide-react";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -23,8 +23,9 @@ export default function BookingsPage() {
       setLoading(true);
       const data = await bookingsApi.getAll();
       setBookings(data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to fetch bookings");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || "Failed to fetch bookings");
     } finally {
       setLoading(false);
     }
@@ -38,8 +39,9 @@ export default function BookingsPage() {
     try {
       await bookingsApi.delete(id);
       setBookings(bookings.filter((b) => b.id !== id));
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to cancel booking");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || "Failed to cancel booking");
     }
   };
 
