@@ -7,8 +7,7 @@ import {
   UpdatePropertyRequest,
   CreateBookingRequest,
   AuthResponse,
-  ApiResponse,
-} from "@/types";
+} from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -27,6 +26,19 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear invalid token and redirect to login
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Auth API
 export const authApi = {
@@ -61,6 +73,11 @@ export const authApi = {
 export const propertiesApi = {
   getAll: async (): Promise<Property[]> => {
     const response = await api.get("/api/properties");
+    return response.data.properties;
+  },
+
+  getMyProperties: async (): Promise<Property[]> => {
+    const response = await api.get("/api/properties/my");
     return response.data.properties;
   },
 

@@ -135,12 +135,12 @@ export default function BookingsPage() {
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-blue-600">
-                      ${booking.totalPrice}
+                      ${booking.totalprice}
                     </div>
                     <div className="text-sm text-gray-500">
                       {calculateNights(
-                        booking.checkInDate,
-                        booking.checkOutDate
+                        booking.checkindate,
+                        booking.checkoutdate
                       )}{" "}
                       nights
                     </div>
@@ -155,7 +155,7 @@ export default function BookingsPage() {
                     <div className="flex items-center mt-1">
                       <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                       <span className="text-gray-900">
-                        {formatDate(booking.checkInDate)}
+                        {formatDate(booking.checkindate)}
                       </span>
                     </div>
                   </div>
@@ -166,7 +166,7 @@ export default function BookingsPage() {
                     <div className="flex items-center mt-1">
                       <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                       <span className="text-gray-900">
-                        {formatDate(booking.checkOutDate)}
+                        {formatDate(booking.checkoutdate)}
                       </span>
                     </div>
                   </div>
@@ -178,7 +178,7 @@ export default function BookingsPage() {
                       <div className="flex items-center text-gray-600">
                         <DollarSign className="h-4 w-4 mr-2" />
                         <span className="text-sm">
-                          ${booking.properties.pricePerNight} per night
+                          ${booking.properties.pricepernight} per night
                         </span>
                       </div>
                       <div className="flex space-x-2">

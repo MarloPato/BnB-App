@@ -20,7 +20,7 @@ const propertySchema = z.object({
   name: z.string().min(1, "Property name is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   location: z.string().min(1, "Location is required"),
-  pricePerNight: z.number().min(1, "Price must be greater than 0"),
+  pricepernight: z.number().min(1, "Price must be greater than 0"),
   availability: z.boolean(),
 });
 
@@ -170,7 +170,7 @@ export default function NewPropertyPage() {
 
             <div>
               <label
-                htmlFor="pricePerNight"
+                htmlFor="pricepernight"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Price per Night (USD)
@@ -180,7 +180,7 @@ export default function NewPropertyPage() {
                   <DollarSign className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  {...register("pricePerNight", { valueAsNumber: true })}
+                  {...register("pricepernight", { valueAsNumber: true })}
                   type="number"
                   min="1"
                   step="0.01"
@@ -188,9 +188,9 @@ export default function NewPropertyPage() {
                   placeholder="0.00"
                 />
               </div>
-              {errors.pricePerNight && (
+              {errors.pricepernight && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.pricePerNight.message}
+                  {errors.pricepernight.message}
                 </p>
               )}
             </div>

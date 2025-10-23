@@ -12,7 +12,7 @@ export interface Property {
   name: string;
   description: string;
   location: string;
-  pricePerNight: number;
+  pricepernight: number;
   availability: boolean;
   user_id: string;
   created_at: string;
@@ -23,9 +23,9 @@ export interface Booking {
   id: string;
   user_id: string;
   property_id: string;
-  checkInDate: string;
-  checkOutDate: string;
-  totalPrice: number;
+  checkindate: string;
+  checkoutdate: string;
+  totalprice: number;
   created_at: string;
   updated_at: string;
   properties?: Property;
@@ -35,7 +35,7 @@ export interface CreatePropertyRequest {
   name: string;
   description: string;
   location: string;
-  pricePerNight: number;
+  pricepernight: number;
   availability: boolean;
 }
 
@@ -43,14 +43,14 @@ export interface UpdatePropertyRequest {
   name?: string;
   description?: string;
   location?: string;
-  pricePerNight?: number;
+  pricepernight?: number;
   availability?: boolean;
 }
 
 export interface CreateBookingRequest {
   property_id: string;
-  checkInDate: string;
-  checkOutDate: string;
+  checkindate: string;
+  checkoutdate: string;
 }
 
 export interface AuthResponse {
@@ -59,7 +59,6 @@ export interface AuthResponse {
 }
 
 export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
+  data: T;
   message?: string;
 }

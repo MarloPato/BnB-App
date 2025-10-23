@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import { Home as HomeIcon, Calendar, Plus, User } from "lucide-react";
+import { Home as HomeIcon, Calendar, Plus, User, Search } from "lucide-react";
 
 export default function Home() {
   const { isAuthenticated, user } = useAuth();
@@ -45,11 +45,18 @@ export default function Home() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Link
+                  href="/browse"
+                  className="flex items-center justify-center space-x-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  <Search className="h-5 w-5" />
+                  <span>Browse Properties</span>
+                </Link>
+                <Link
                   href="/properties"
                   className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <HomeIcon className="h-5 w-5" />
-                  <span>View Properties</span>
+                  <span>My Properties</span>
                 </Link>
                 <Link
                   href="/properties/new"
@@ -64,13 +71,6 @@ export default function Home() {
                 >
                   <Calendar className="h-5 w-5" />
                   <span>My Bookings</span>
-                </Link>
-                <Link
-                  href="/profile"
-                  className="flex items-center justify-center space-x-2 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  <User className="h-5 w-5" />
-                  <span>Profile</span>
                 </Link>
               </div>
             </div>

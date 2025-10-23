@@ -7,30 +7,29 @@ import { propertiesApi } from "@/lib/api";
 import { Property } from "@/types";
 import {
   Home,
-  Plus,
-  Edit,
-  Trash2,
   MapPin,
   DollarSign,
   Calendar,
+  Search,
+  Filter,
 } from "lucide-react";
 
-export default function PropertiesPage() {
+export default function BrowsePage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { user, isAuthenticated } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchProperties();
-    }
-  }, [isAuthenticated]);
+    fetchProperties();
+  }, []);
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const data = await propertiesApi.getMyProperties();
+      const data = await propertiesApi.getAll();
       setProperties(data);
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to fetch properties");
@@ -39,36 +38,17 @@ export default function PropertiesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this property?")) {
-      return;
-    }
+  const filteredProperties = properties.filter((property) => {
+    const matchesSearch =
+      property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-    try {
-      await propertiesApi.delete(id);
-      setProperties(properties.filter((p) => p.id !== id));
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to delete property");
-    }
-  };
+    const matchesPrice =
+      !maxPrice || property.pricepernight <= parseFloat(maxPrice);
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Please log in to view properties
-          </h1>
-          <Link
-            href="/login"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Sign In
-          </Link>
-        </div>
-      </div>
-    );
-  }
+    return matchesSearch && matchesPrice;
+  });
 
   if (loading) {
     return (
@@ -84,15 +64,44 @@ export default function PropertiesPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Properties</h1>
-          <Link
-            href="/properties/new"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Add Property</span>
-          </Link>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Browse Properties
+          </h1>
+          <p className="text-gray-600">
+            Discover amazing BnB properties for your next stay.
+          </p>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search properties..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="relative">
+              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="number"
+                placeholder="Max price per night"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="flex items-center">
+              <span className="text-sm text-gray-600">
+                {filteredProperties.length} properties found
+              </span>
+            </div>
+          </div>
         </div>
 
         {error && (
@@ -101,28 +110,31 @@ export default function PropertiesPage() {
           </div>
         )}
 
-        {properties.length === 0 ? (
+        {filteredProperties.length === 0 ? (
           <div className="text-center py-12">
             <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No properties yet
+              No properties found
             </h3>
             <p className="text-gray-600 mb-6">
-              Get started by adding your first BnB property.
+              Try adjusting your search criteria or check back later for new
+              listings.
             </p>
-            <Link
-              href="/properties/new"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-            >
-              Add Your First Property
-            </Link>
+            {isAuthenticated && (
+              <Link
+                href="/properties/new"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+              >
+                Add Your Property
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
+            {filteredProperties.map((property) => (
               <div
                 key={property.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="h-48 bg-gray-200 flex items-center justify-center">
                   <Home className="h-12 w-12 text-gray-400" />
@@ -160,22 +172,12 @@ export default function PropertiesPage() {
                     </div>
                   </div>
 
-                  <div className="flex space-x-2">
-                    <Link
-                      href={`/properties/${property.id}/edit`}
-                      className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded text-center hover:bg-gray-200 flex items-center justify-center space-x-1"
-                    >
-                      <Edit className="h-4 w-4" />
-                      <span>Edit</span>
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(property.id)}
-                      className="flex-1 bg-red-100 text-red-700 px-3 py-2 rounded hover:bg-red-200 flex items-center justify-center space-x-1"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span>Delete</span>
-                    </button>
-                  </div>
+                  <Link
+                    href={`/properties/${property.id}`}
+                    className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-center block"
+                  >
+                    View Details & Book
+                  </Link>
                 </div>
               </div>
             ))}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { Home, User, LogOut, Plus, Calendar } from "lucide-react";
+import { Home, User, LogOut, Plus, Calendar, Search } from "lucide-react";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -21,6 +21,14 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <Link
+              href="/browse"
+              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1"
+            >
+              <Search className="h-4 w-4" />
+              <span>Browse</span>
+            </Link>
+
             {isAuthenticated ? (
               <>
                 <Link
@@ -28,7 +36,7 @@ export default function Navbar() {
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1"
                 >
                   <Home className="h-4 w-4" />
-                  <span>Properties</span>
+                  <span>My Properties</span>
                 </Link>
 
                 <Link
