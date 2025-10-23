@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { propertiesApi } from "@/lib/api";
 import { Property } from "../../types";
@@ -130,8 +131,28 @@ export default function BrowsePage() {
                 key={property.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
-                  <Home className="h-12 w-12 text-gray-400" />
+                <div className="h-48 bg-gray-200 flex items-center justify-center overflow-hidden relative">
+                  {property.image_url ? (
+                    <Image
+                      src={property.image_url}
+                      alt={property.name}
+                      fill
+                      className="object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        (
+                          e.currentTarget.nextElementSibling as HTMLElement
+                        )?.style.setProperty("display", "flex");
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`h-full w-full flex items-center justify-center ${
+                      property.image_url ? "hidden" : "flex"
+                    }`}
+                  >
+                    <Home className="h-12 w-12 text-gray-400" />
+                  </div>
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">

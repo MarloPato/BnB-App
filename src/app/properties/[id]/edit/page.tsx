@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import { propertiesApi } from "@/lib/api";
+import { useEffect, useState, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "../../../../contexts/AuthContext";
+import { propertiesApi } from "../../../../lib/api";
+import { Property } from "../../../../types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +15,7 @@ import {
   FileText,
   ToggleLeft,
   ToggleRight,
+  ArrowLeft,
 } from "lucide-react";
 
 const propertySchema = z.object({
@@ -22,20 +24,21 @@ const propertySchema = z.object({
   location: z.string().min(1, "Location is required"),
   pricepernight: z.number().min(1, "Price must be greater than 0"),
   availability: z.boolean(),
-  image_url: z
-    .string()
-    .url("Please enter a valid image URL")
-    .optional()
-    .or(z.literal("")),
+  image_url: z.string().url("Please enter a valid image URL").optional().or(z.literal("")),
 });
 
 type PropertyForm = z.infer<typeof propertySchema>;
 
-export default function NewPropertyPage() {
+export default function EditPropertyPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [property, setProperty] = useState<Property | null>(null);
   const { isAuthenticated } = useAuth();
+  const params = useParams();
   const router = useRouter();
+
+  const propertyId = params.id as string;
 
   const {
     register,
@@ -52,16 +55,43 @@ export default function NewPropertyPage() {
 
   const availability = watch("availability");
 
+  const fetchProperty = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await propertiesApi.getById(propertyId);
+      setProperty(data);
+
+      // Populate form with existing data
+      setValue("name", data.name);
+      setValue("description", data.description);
+      setValue("location", data.location);
+      setValue("pricepernight", data.pricepernight);
+      setValue("availability", data.availability);
+      setValue("image_url", data.image_url || "");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || "Failed to fetch property");
+    } finally {
+      setLoading(false);
+    }
+  }, [propertyId, setValue]);
+
+  useEffect(() => {
+    if (propertyId) {
+      fetchProperty();
+    }
+  }, [propertyId, fetchProperty]);
+
   const onSubmit = async (data: PropertyForm) => {
     setIsLoading(true);
     setError("");
 
     try {
-      await propertiesApi.create(data);
+      await propertiesApi.update(propertyId, data);
       router.push("/properties");
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: string } } };
-      setError(error.response?.data?.error || "Failed to create property");
+      setError(error.response?.data?.error || "Failed to update property");
     } finally {
       setIsLoading(false);
     }
@@ -72,23 +102,64 @@ export default function NewPropertyPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Please log in to create properties
+            Please log in to edit properties
           </h1>
         </div>
       </div>
     );
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading property...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !property) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Property not found
+          </h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => router.back()}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Back to Properties
+        </button>
+
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Add New Property
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">Edit Property</h1>
             <p className="text-gray-600 mt-2">
-              Create a new BnB listing for guests to book.
+              Update your BnB listing information.
             </p>
           </div>
 
@@ -164,7 +235,7 @@ export default function NewPropertyPage() {
                   {...register("location")}
                   type="text"
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="e.g., Stockholm, Sweden"
+                  placeholder="e.g., New York, NY"
                 />
               </div>
               {errors.location && (
@@ -225,42 +296,63 @@ export default function NewPropertyPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Availability
               </label>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4">
                 <button
                   type="button"
-                  onClick={() => setValue("availability", !availability)}
-                  className="flex items-center space-x-2"
+                  onClick={() => setValue("availability", true)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+                    availability
+                      ? "bg-green-50 border-green-200 text-green-700"
+                      : "bg-gray-50 border-gray-200 text-gray-700"
+                  }`}
                 >
                   {availability ? (
-                    <ToggleRight className="h-6 w-6 text-green-600" />
+                    <ToggleRight className="h-5 w-5" />
                   ) : (
-                    <ToggleLeft className="h-6 w-6 text-gray-400" />
+                    <ToggleLeft className="h-5 w-5" />
                   )}
-                  <span
-                    className={`text-sm font-medium ${
-                      availability ? "text-green-600" : "text-gray-500"
-                    }`}
-                  >
-                    {availability ? "Available for booking" : "Not available"}
-                  </span>
+                  <span>Available</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setValue("availability", false)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+                    !availability
+                      ? "bg-red-50 border-red-200 text-red-700"
+                      : "bg-gray-50 border-gray-200 text-gray-700"
+                  }`}
+                >
+                  {!availability ? (
+                    <ToggleRight className="h-5 w-5" />
+                  ) : (
+                    <ToggleLeft className="h-5 w-5" />
+                  )}
+                  <span>Not Available</span>
                 </button>
               </div>
             </div>
 
-            <div className="flex space-x-4 pt-6">
+            <div className="flex space-x-4">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 bg-gray-100 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-200 font-medium"
+                className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {isLoading ? "Creating..." : "Create Property"}
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  "Update Property"
+                )}
               </button>
             </div>
           </form>

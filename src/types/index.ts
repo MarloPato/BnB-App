@@ -14,6 +14,7 @@ export interface Property {
   location: string;
   pricepernight: number;
   availability: boolean;
+  image_url?: string;
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -29,6 +30,7 @@ export interface Booking {
   created_at: string;
   updated_at: string;
   properties?: Property;
+  users?: User;
 }
 
 export interface CreatePropertyRequest {
@@ -37,6 +39,7 @@ export interface CreatePropertyRequest {
   location: string;
   pricepernight: number;
   availability: boolean;
+  image_url?: string;
 }
 
 export interface UpdatePropertyRequest {
@@ -45,6 +48,7 @@ export interface UpdatePropertyRequest {
   location?: string;
   pricepernight?: number;
   availability?: boolean;
+  image_url?: string;
 }
 
 export interface CreateBookingRequest {

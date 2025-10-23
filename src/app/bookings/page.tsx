@@ -174,6 +174,36 @@ export default function BookingsPage() {
                   </div>
                 </div>
 
+                {booking.users && (
+                  <div className="border-t pt-4 mb-4">
+                    <h4 className="text-sm font-medium text-gray-500 mb-2">
+                      Booking Details
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">
+                          Booked by
+                        </label>
+                        <div className="mt-1">
+                          <span className="text-gray-900 font-medium">
+                            {booking.users.name}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">
+                          Email
+                        </label>
+                        <div className="mt-1">
+                          <span className="text-gray-900">
+                            {booking.users.email}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {booking.properties && (
                   <div className="border-t pt-4">
                     <div className="flex items-center justify-between">

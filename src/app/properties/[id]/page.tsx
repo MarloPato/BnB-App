@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { propertiesApi, bookingsApi } from "@/lib/api";
 import { Property } from "../../../types";
@@ -169,8 +170,28 @@ export default function PropertyDetailPage() {
           {/* Property Details */}
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="h-64 bg-gray-200 flex items-center justify-center">
-                <Home className="h-16 w-16 text-gray-400" />
+              <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden relative">
+                {property.image_url ? (
+                  <Image
+                    src={property.image_url}
+                    alt={property.name}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      (
+                        e.currentTarget.nextElementSibling as HTMLElement
+                      )?.style.setProperty("display", "flex");
+                    }}
+                  />
+                ) : null}
+                <div
+                  className={`h-full w-full flex items-center justify-center ${
+                    property.image_url ? "hidden" : "flex"
+                  }`}
+                >
+                  <Home className="h-16 w-16 text-gray-400" />
+                </div>
               </div>
               <div className="p-6">
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">
