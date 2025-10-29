@@ -39,11 +39,19 @@ export default function LoginPage() {
       await login(data.email, data.password);
       router.push("/");
     } catch (err: unknown) {
-      if (err && typeof err === "object" && "response" in err) {
-        const errorResponse = err as {
-          response?: { data?: { error?: string } };
-        };
-        setError(errorResponse.response?.data?.error || "Login failed");
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "error" in err.response.data &&
+        typeof err.response.data.error === "string"
+      ) {
+        setError(err.response.data.error);
       } else {
         setError("Login failed");
       }
