@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { bookingsApi } from "@/lib/api";
 import { Booking } from "../../types";
@@ -109,12 +110,12 @@ export default function BookingsPage() {
               Start by browsing available properties and making your first
               booking.
             </p>
-            <a
-              href="/properties"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+            <Link
+              href="/browse"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 inline-block"
             >
               Browse Properties
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="space-y-6">
