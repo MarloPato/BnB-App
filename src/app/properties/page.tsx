@@ -57,14 +57,14 @@ export default function PropertiesPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50/30 to-amber-100/50">
+        <div className="text-center bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-10 border border-amber-100/50">
+          <h1 className="text-3xl font-semibold text-gray-800 mb-6">
             Please log in to view properties
           </h1>
           <Link
             href="/login"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-3 rounded-2xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium inline-block"
           >
             Sign In
           </Link>
@@ -75,23 +75,27 @@ export default function PropertiesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50/30 to-amber-100/50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading properties...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-amber-200 border-t-amber-600 mx-auto"></div>
+          <p className="mt-6 text-lg text-gray-700 font-medium">
+            Loading properties...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/30 to-amber-100/50 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Properties</h1>
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-semibold text-gray-800 tracking-tight">
+            My Properties
+          </h1>
           <Link
             href="/properties/new"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+            className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-2xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2 font-medium"
           >
             <Plus className="h-5 w-5" />
             <span>Add Property</span>
@@ -99,33 +103,35 @@ export default function PropertiesPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50/90 border-2 border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-6 shadow-sm backdrop-blur-sm">
             {error}
           </div>
         )}
 
         {properties.length === 0 ? (
-          <div className="text-center py-12">
-            <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <div className="text-center py-16 bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-amber-100/50">
+            <div className="inline-flex p-6 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 mb-6">
+              <Home className="h-16 w-16 text-amber-600" />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-800 mb-3">
               No properties yet
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
               Get started by adding your first BnB property.
             </p>
             <Link
               href="/properties/new"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium inline-block"
             >
               Add Your First Property
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {properties.map((property) => (
               <div
                 key={property.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
+                className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-amber-100/50"
               >
                 <div className="h-48 bg-gray-200 flex items-center justify-center overflow-hidden relative">
                   {property.image_url ? (
@@ -186,14 +192,14 @@ export default function PropertiesPage() {
                   <div className="flex space-x-2">
                     <Link
                       href={`/properties/${property.id}/edit`}
-                      className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded text-center hover:bg-gray-200 flex items-center justify-center space-x-1"
+                      className="flex-1 bg-amber-50 text-amber-700 border-2 border-amber-200 px-3 py-2 rounded-2xl text-center hover:bg-amber-100 flex items-center justify-center space-x-1 transition-all duration-300 font-medium"
                     >
                       <Edit className="h-4 w-4" />
                       <span>Edit</span>
                     </Link>
                     <button
                       onClick={() => handleDelete(property.id)}
-                      className="flex-1 bg-red-100 text-red-700 px-3 py-2 rounded hover:bg-red-200 flex items-center justify-center space-x-1"
+                      className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-2 rounded-2xl hover:from-red-600 hover:to-red-700 flex items-center justify-center space-x-1 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span>Delete</span>

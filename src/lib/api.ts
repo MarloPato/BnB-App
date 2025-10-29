@@ -76,6 +76,11 @@ export const propertiesApi = {
     return response.data.properties;
   },
 
+  getAllAdmin: async (): Promise<Property[]> => {
+    const response = await api.get("/api/properties/all");
+    return response.data.properties;
+  },
+
   getMyProperties: async (): Promise<Property[]> => {
     const response = await api.get("/api/properties/my");
     return response.data.properties;
