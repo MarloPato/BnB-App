@@ -20,8 +20,13 @@ app.use(
   })
 );
 
-app.options("*", () => {
-  return new Response(null, { status: 204 });
+app.options("*", (c) => {
+  return c.body(null, 204, {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Credentials": "true",
+  });
 });
 
 app.get("/", (c) => {
@@ -41,7 +46,12 @@ app.onError((err, c) => {
   return c.json({ error: "Internal Server Error" }, 500);
 });
 
-export default app;
+const handler = async (req: Request) => {
+  return app.fetch(req);
+};
+
+export default handler;
+export { handler };
 
 if (process.env.NODE_ENV !== "production") {
   const { serve } = require("@hono/node-server");
@@ -52,6 +62,3 @@ if (process.env.NODE_ENV !== "production") {
     port: Number(port),
   });
 }
-
-// Lägg till längst ner i filen, efter export default app;
-export const handler = app.fetch;
