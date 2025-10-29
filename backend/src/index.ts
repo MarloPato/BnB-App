@@ -13,10 +13,16 @@ const app = new Hono();
 app.use(
   "*",
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: "*",
     credentials: true,
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.options("*", () => {
+  return new Response(null, { status: 204 });
+});
 
 app.get("/", (c) => {
   return c.json({ message: "BnB Management API is running!" });
