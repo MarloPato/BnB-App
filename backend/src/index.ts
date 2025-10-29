@@ -10,6 +10,29 @@ dotenv.config();
 
 const app = new Hono();
 
+app.use("*", async (c, next) => {
+  if (c.req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "true",
+      },
+    });
+  }
+
+  await next();
+
+  c.header("Access-Control-Allow-Origin", "*");
+  c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  c.header("Access-Control-Allow-Credentials", "true");
+
+  return;
+});
+
 app.use(
   "*",
   cors({
@@ -19,15 +42,6 @@ app.use(
     allowHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.options("*", (c) => {
-  return c.body(null, 204, {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Allow-Credentials": "true",
-  });
-});
 
 app.get("/", (c) => {
   return c.json({ message: "BnB Management API is running!" });
@@ -46,12 +60,7 @@ app.onError((err, c) => {
   return c.json({ error: "Internal Server Error" }, 500);
 });
 
-const handler = async (req: Request) => {
-  return app.fetch(req);
-};
-
-export default handler;
-export { handler };
+export default app;
 
 if (process.env.NODE_ENV !== "production") {
   const { serve } = require("@hono/node-server");
