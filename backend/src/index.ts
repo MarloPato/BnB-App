@@ -46,3 +46,6 @@ if (process.env.NODE_ENV !== "production") {
     port: Number(port),
   });
 }
+
+// Lägg till längst ner i filen, efter export default app;
+export const handler = app.fetch;
