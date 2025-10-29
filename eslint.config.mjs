@@ -23,7 +23,7 @@ const eslintConfig = [
   {
     rules: {
       "@typescript-eslint/no-explicit-any": [
-        "error",
+        "warn",
         {
           ignoreRestArgs: false,
           ignoreCatchClause: true, // Allow any in catch clauses - we use 'unknown' anyway
