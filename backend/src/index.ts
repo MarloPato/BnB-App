@@ -10,50 +10,36 @@ dotenv.config();
 
 const app = new Hono();
 
-app.use("*", async (c, next) => {
-  if (c.req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Credentials": "true",
-      },
-    });
-  }
-
-  await next();
-
-  c.header("Access-Control-Allow-Origin", "*");
-  c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  c.header("Access-Control-Allow-Credentials", "true");
-
-  return;
-});
+const allowedOrigins = [
+  "https://bnb-frontend-black.vercel.app",
+  "http://localhost:3000",
+];
 
 app.use(
   "*",
   cors({
-    origin: "*",
-    credentials: true,
+    origin: (origin, _c) => {
+      if (!origin) return null;
+
+      if (allowedOrigins.includes(origin)) {
+        return origin;
+      }
+
+      return null;
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
-app.get("/", (c) => {
-  return c.json({ message: "BnB Management API is running!" });
-});
+app.get("/", (c) => c.json({ message: "BnB Management API is running!" }));
 
 app.route("/api/auth", auth);
 app.route("/api/properties", properties);
 app.route("/api/bookings", bookings);
 
-app.notFound((c) => {
-  return c.json({ error: "Not Found" }, 404);
-});
+app.notFound((c) => c.json({ error: "Not Found" }, 404));
 
 app.onError((err, c) => {
   console.error("Error:", err);
