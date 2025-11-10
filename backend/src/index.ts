@@ -10,22 +10,36 @@ dotenv.config();
 
 const app = new Hono();
 
+app.use("*", async (c, next) => {
+  if (c.req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "true",
+      },
+    });
+  }
+
+  await next();
+
+  c.header("Access-Control-Allow-Origin", "*");
+  c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  c.header("Access-Control-Allow-Credentials", "true");
+
+  return;
+});
+
 app.use(
   "*",
   cors({
-    origin: (origin) => {
-      if (origin === "http://localhost:3000") {
-        return origin;
-      } else return "https://bnb-frontend-black.vercel.app";
-    },
-    allowHeaders: [
-      "Authorization",
-      "Content-Type",
-      "Access-Control-Allow-Origin",
-    ],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: "*",
     credentials: true,
-    exposeHeaders: ["Set-Cookie"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
   })
 );
 
